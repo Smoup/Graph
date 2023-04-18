@@ -2,3 +2,6 @@ name: Graph
 version: '${project.version}'
 main: main.graph.Graph
 api-version: 1.19
+commands:
+  graph:
+    description: "Use to set panel position"
