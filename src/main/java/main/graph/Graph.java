@@ -8,10 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public final class Graph extends JavaPlugin {
 
@@ -22,8 +19,7 @@ public final class Graph extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
-
-        getCommand("graph").setExecutor(new Commands());
+        Objects.requireNonNull(getCommand("graph")).setExecutor(new Commands());
         Bukkit.getPluginManager().registerEvents(new BukkitEventHandler(), this);
     }
 
@@ -36,6 +32,7 @@ public final class Graph extends JavaPlugin {
     private static Map<String, Integer> cmdGraph = new HashMap<>();
     @Getter @Setter
     private static Map<String, Boolean> cmdGraphSetMaterial = new HashMap<>();
+
     @Getter @Setter
     private static Location panel1;
     @Getter @Setter
@@ -44,5 +41,13 @@ public final class Graph extends JavaPlugin {
     private static List<Block> graphBlocks = new ArrayList<>();
     @Getter @Setter
     private static Material graphMaterial;
+    @Getter @Setter
+    private static int stepMaxHigh;
+    @Getter @Setter
+    private static int distToBorder;
+    @Getter @Setter
+    private static long updateTime;
+    @Getter @Setter
+    private static boolean isGraphStart;
 
 }
