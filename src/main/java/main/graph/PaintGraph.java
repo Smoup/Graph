@@ -37,97 +37,76 @@ public class PaintGraph {
        }
     }
     public static void setNext() {
-        System.out.println("top");
         List<Block> setBlocks = Graph.getGraphBlocks();
-        World world = Graph.getPanel1().getBlock().getWorld();
         Random random = new Random();
+        World w = Graph.getPanel1().getBlock().getWorld();
 
         Location firstP = Graph.getPanel1();
         Location secondP = Graph.getPanel2();
 
-        int y = firstP.getBlock().getY();
-        int minX = firstP.getBlock().getX();
-        int minZ = firstP.getBlock().getZ();
-        int maxX = secondP.getBlock().getX();
-        int maxZ = secondP.getBlock().getZ();
-        int sizeZ = Math.abs(maxZ - minZ);
+        int y = firstP.getBlockY();
+        int x1 = firstP.getBlockX();
+        int z1 = firstP.getBlockZ();
+        int x2 = secondP.getBlockX();
+        int z2 = secondP.getBlockZ();
+
+        int sizeX = Math.abs(x1 - x2);
+        int sizeZ = Math.abs(z1 - z2);
+
+        Material gM = Graph.getGraphMaterial();
 
         int maxStep = Graph.getStepMaxHigh();
 
-        Material graphMaterial = Graph.getGraphMaterial();
-        Material air = Material.AIR;
-
-        if (setBlocks.isEmpty()) {
-            Block block = world.getBlockAt(new Location(world, minX + 1, y, random.nextInt(sizeZ)));
-            block.setType(graphMaterial);
-            Graph.getGraphBlocks().add(block);
-
-        } else if (setBlocks.size() <= sizeZ - Graph.getDistToBorder()) {
-            int step = random.nextInt(maxStep + 1);
-            while (isInGraph(minX, maxX, setBlocks.get(setBlocks.size() - 1).getX(), step)) {
-                step = random.nextInt(maxStep + 1);
-            }
-            if (random.nextBoolean()) {
-                step = step * -1;
-            }
-
-            if (step == 0) {
-                Block block = world.getBlockAt(new Location(world, minX + 1, y, step));
-                block.setType(graphMaterial);
-                Graph.getGraphBlocks().add(block);
-            } else {
+        if (x1 > x2 && z1 < z2) {
+            if (setBlocks.isEmpty()) {
+                int rInt = random.nextInt(sizeZ);
+                while (!(rInt + z1 <= z2)) {
+                    rInt = random.nextInt(sizeZ);
+                }
+                Location targetLoc = new Location(w, x1, y, z1 + rInt);
+                setBlock(targetLoc, gM);
+                Graph.getGraphBlocks().add(targetLoc.getBlock());
+            } else if (x1 - setBlocks.size() < x2 + Graph.getDistToBorder()) {
+                int rInt = random.nextInt(maxStep);
                 int lastZ = setBlocks.get(setBlocks.size() - 1).getZ();
-                if (step < 0) {
-                    for (int i = 0; i < Math.abs(step); i++) {
-                        Block block = world.getBlockAt(new Location(world, minX + setBlocks.size() + 1, y, lastZ - i));
-                        block.setType(graphMaterial);
-                    }
-                    Block block = world.getBlockAt(new Location(world, minX + setBlocks.size() + 1, y, lastZ - step));
-                    block.setType(graphMaterial);
-                    Graph.getGraphBlocks().add(block);
-                } else {
-                    for (int i = 0; i < Math.abs(step); i++) {
-                        Block block = world.getBlockAt(new Location(world, minX + setBlocks.size() + 1, y, lastZ + i));
-                        block.setType(graphMaterial);
-                    }
-                    Block block = world.getBlockAt(new Location(world, minX + setBlocks.size() + 1, y, lastZ + step));
-                    block.setType(graphMaterial);
-                    Graph.getGraphBlocks().add(block);
+                while (!(rInt + lastZ <= z2)) {
+                    rInt = random.nextInt(maxStep);
                 }
-            }
-            System.out.println("Set 2");
-        } else {
-            Block block = setBlocks.get(0);
-            block.setType(air);
-            Graph.getGraphBlocks().remove(0);
-            int previousZ = block.getZ();
-            for (int i = 0; i < Graph.getGraphBlocks().size(); i++) {
-                Block block1 = Graph.getGraphBlocks().get(i);
-                if (block1.getZ() == previousZ) {
-                    Block block2 = world.getBlockAt(new Location(world, block1.getX() - 1, y, previousZ));
-                    block2.setType(graphMaterial);
-                    block1.setType(air);
-                } else if (previousZ != block1.getZ()) {
-                    int difference = previousZ - block1.getZ();
-                    if (difference < 0) {
-                        for (int i1 = 0; i < Math.abs(difference); i++) {
-                            Block block2 = world.getBlockAt(new Location(world, minX + setBlocks.size() + 1, y, previousZ - i1));
-                            block2.setType(graphMaterial);
-                        }
+                //TODO
+                //Сделать установку на все блоки от прошлого до нынешнего
+                Location targetLoc = new Location(w, x1 + setBlocks.size(), y, rInt + lastZ);
+                setBlock(targetLoc, gM);
+                Graph.getGraphBlocks().add(targetLoc.getBlock());
+            } else {
+                for (int i = 0; i < setBlocks.size() - 1; i++) {
+                    Block block = setBlocks.get(i);
+                    if (i == 0) {
+                        block.setType(Material.AIR);
+                        continue;
+                    }
+                    Block firstB = setBlocks.get(i - 1);
+
+                    if (i == 1){
+
+                    } else if (i < setBlocks.size() - 2){
+
                     } else {
-                        for (int i1 = 0; i < Math.abs(difference); i++) {
-                            Block block2 = world.getBlockAt(new Location(world, minX + setBlocks.size() + 1, y, previousZ + i1));
-                            block2.setType(graphMaterial);
-                        }
+
                     }
-                    previousZ = block1.getZ();
                 }
+                Graph.getGraphBlocks().remove(0);
             }
-            System.out.println("Set 3");
+
+        } else if (x1 < x2 && z1 < z2) {
+
+        } else if (x1 < x2 && z1 > z2) {
+
+        } else if (x1 > x2 && z1 > z2) {
+
         }
     }
 
-    private static boolean isInGraph(int minX, int maxX, int previousX, int step) {
-        return minX > previousX + step && previousX + step > maxX;
+    public static void setBlock(Location location, Material material) {
+        location.getBlock().setType(material);
     }
 }
